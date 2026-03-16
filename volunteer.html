@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Volunteer with Community Health Bridge — support health education workshops, curriculum development, and outreach.">
+  <title>Volunteer — Community Health Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="label label--light">Get Involved</span>
+      <h1>Volunteer with CHB</h1>
+      <p class="subtitle" style="color: rgba(255,255,255,0.5);">Help bring health education to the next generation of
+        learners.</p>
+    </div>
+  </section>
+
+  <section class="section section--tinted">
+    <div class="container">
+      <div class="split">
+        <div class="reveal-left">
+          <h3 style="margin-bottom: 20px;">Volunteer Roles</h3>
+          <div class="role-list">
+            <div class="role-card">
+              <div class="role-icon">🧑‍🏫</div>
+              <div>
+                <h4>Workshop Assistant</h4>
+                <p>Support instructors during live health education sessions.</p>
+              </div>
+            </div>
+            <div class="role-card">
+              <div class="role-icon">📝</div>
+              <div>
+                <h4>Curriculum Development</h4>
+                <p>Help design and refine age-appropriate educational materials.</p>
+              </div>
+            </div>
+            <div class="role-card">
+              <div class="role-icon">🎤</div>
+              <div>
+                <h4>Session Facilitator</h4>
+                <p>Lead programs and engage directly with students.</p>
+              </div>
+            </div>
+            <div class="role-card">
+              <div class="role-icon">📣</div>
+              <div>
+                <h4>Outreach Support</h4>
+                <p>Help connect CHB with schools and community partners.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="vol-section" style="margin-top: 28px;">
+            <h4>Requirements</h4>
+            <ul class="check-list">
+              <li>Interest in education or healthcare</li>
+              <li>Commitment to professionalism and student safety</li>
+              <li>Willingness to work with youth</li>
+              <li>Reliability and dedication to the mission</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="reveal-right">
+          <div class="form-card">
+            <h3 style="margin-bottom: 6px; font-size: 1.15rem;">Volunteer Application</h3>
+            <p style="color: var(--gray-500); font-size: 0.9rem; margin-bottom: 22px;">Fill out the form below and we'll
+              be in touch.</p>
+            <form id="volunteer-form" action="https://formsubmit.co/f8286a03d8f3525a045d4bc6c5705301" method="POST">
+              <input type="hidden" name="_subject" value="New CHB Volunteer Application">
+              <input type="hidden" name="_captcha" value="false">
+              <input type="hidden" name="_template" value="table">
+              <input type="hidden" name="_next" value="">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="vol-name">Full Name <span class="req">*</span></label>
+                  <input type="text" id="vol-name" name="Name" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                  <label for="vol-email">Email <span class="req">*</span></label>
+                  <input type="email" id="vol-email" name="Email" placeholder="your@email.com" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="vol-phone">Phone <span class="opt">(optional)</span></label>
+                  <input type="tel" id="vol-phone" name="Phone" placeholder="(555) 123-4567">
+                </div>
+                <div class="form-group">
+                  <label for="vol-role">Preferred Role</label>
+                  <select id="vol-role" name="Preferred Role">
+                    <option value="">Select a role...</option>
+                    <option value="workshop-assistant">Workshop Assistant</option>
+                    <option value="curriculum">Curriculum Development</option>
+                    <option value="facilitator">Session Facilitator</option>
+                    <option value="outreach">Outreach Support</option>
+                    <option value="any">Open to Anything</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="vol-why">Why do you want to volunteer?</label>
+                <textarea id="vol-why" name="Motivation"
+                  placeholder="Tell us a bit about yourself and why you're interested..." rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn--solid form-submit">Submit Application</button>
+            </form>
+            <div class="form-success" id="vol-success">
+              <div class="form-success-icon">✓</div>
+              <h3>Application Received</h3>
+              <p>Thank you — we'll reach out to you shortly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+  <script src="components.js"></script>
+  <script>loadComponents('volunteer');</script>
+  <script src="script.js"></script>
+</body>
+
+</html>
