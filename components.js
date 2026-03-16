@@ -21,8 +21,7 @@ function getNavbar(activePage) {
   <nav class="navbar" aria-label="Main navigation">
     <div class="container">
       <a href="index.html" class="nav-logo" aria-label="Community Health Bridge Home">
-        <span class="logo-mark">✦</span>
-        <span class="logo-text">Community Health Bridge<span>educate · inspire · empower</span></span>
+        <img src="images/image_logo.png" alt="Community Health Bridge" class="logo-img">
       </a>
 
       <div class="nav-overlay" id="nav-overlay"></div>
@@ -49,8 +48,7 @@ function getFooter() {
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="index.html" class="nav-logo" aria-label="Community Health Bridge Home">
-            <span class="logo-mark">✦</span>
-            <span class="logo-text">Community Health Bridge<span>educate · inspire · empower</span></span>
+            <img src="images/image_logo.png" alt="Community Health Bridge" class="logo-img">
           </a>
           <p>Accessible health education designed to inspire curiosity and promote lifelong wellness in young learners.</p>
           <div class="footer-social">
@@ -85,7 +83,7 @@ function getFooter() {
           <div class="footer-contact">
             <div class="footer-contact-item">
               <span>✉</span>
-              <span>contact@chb.org</span>
+              <span>utkarsh.tewari@hotmail.com</span>
             </div>
             <div class="footer-contact-item">
               <span>◎</span>
