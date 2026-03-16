@@ -1081,6 +1081,11 @@ em,
 
 
 /* ---------- Sign Up / Form ---------- */
+.split--signup {
+  grid-template-columns: 1fr 1.1fr;
+}
+
+
 .signup-info h3 {
   margin-bottom: 14px;
   font-size: 1.25rem;
@@ -1607,7 +1612,7 @@ em,
   }
 
   .split {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 36px;
   }
 
@@ -1627,6 +1632,23 @@ em,
     grid-template-columns: 1fr;
   }
 
+  .form-card {
+    padding: 24px 20px;
+    border-radius: var(--r-lg);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px; /* prevents iOS auto-zoom */
+    padding: 12px 14px;
+  }
+
+  .form-submit {
+    padding: 14px;
+    font-size: 1rem;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -1640,5 +1662,18 @@ em,
 
   .btn-group {
     flex-direction: column;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .form-card {
+    padding: 18px 16px;
+  }
+
+  .signup-info h3,
+  .form-card > h3 {
+    font-size: 1.1rem;
   }
 }
