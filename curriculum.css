@@ -287,11 +287,14 @@
   z-index: 0;
 }
 
-.tier-t1 .path-line-fill { background: linear-gradient(180deg, #0D9E75, rgba(13,158,117,0.2)); }
-.tier-t2 .path-line-fill { background: linear-gradient(180deg, #534AB7, rgba(83,74,183,0.2)); }
-.tier-t3 .path-line-fill { background: linear-gradient(180deg, #D85A30, rgba(216,90,48,0.2)); }
+/* Fill grows from bottom upward to match bottom-to-top path direction */
+.tier-t1 .path-line-fill { background: linear-gradient(0deg, #0D9E75, rgba(13,158,117,0.2)); }
+.tier-t2 .path-line-fill { background: linear-gradient(0deg, #534AB7, rgba(83,74,183,0.2)); }
+.tier-t3 .path-line-fill { background: linear-gradient(0deg, #D85A30, rgba(216,90,48,0.2)); }
 
 .path-line-fill {
+  position: absolute;
+  bottom: 0;
   width: 100%;
   height: 0%;
   border-radius: 4px;

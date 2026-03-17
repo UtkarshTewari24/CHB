@@ -165,7 +165,12 @@ function isTierUnlocked(tier) {
   return srcTier ? getTierCompletedModules(srcTier) >= tier.unlockRequirement.modulesNeeded : false;
 }
 function isModuleUnlocked(tier, mod) {
-  return isTierUnlocked(tier);
+  if (!isTierUnlocked(tier)) return false;
+  const modIdx = tier.modules.indexOf(mod);
+  if (modIdx === 0) return true;
+  const prev = tier.modules[modIdx - 1];
+  const prevProg = getModuleProgress(prev);
+  return prevProg.done === prevProg.total;
 }
 function getTotalLessons() {
   return CURRICULUM.tiers.reduce((a, t) => a + t.modules.reduce((b, m) => b + m.lessons.length, 0), 0);
@@ -201,112 +206,103 @@ function showXPToast(msg) {
 }
 
 function renderPath() {
-  const container = document.getElementById('curriculum-path');
+  var container = document.getElementById('curriculum-path');
   if (!container) return;
   container.innerHTML = '';
 
-  CURRICULUM.tiers.forEach((tier, ti) => {
-    const tierUnlocked = isTierUnlocked(tier);
+  // Render bottom-to-top: T3 first in DOM, T1 last (so T1 M1 sits at the bottom = start)
+  var tiersReversed = CURRICULUM.tiers.slice().reverse();
 
-    // Tier gate (between tiers)
-    if (ti > 0) {
-      const req = tier.unlockRequirement;
-      const srcTier = CURRICULUM.tiers.find(t => t.id === req.tier);
-      const done = getTierCompletedModules(srcTier);
-      const needed = req.modulesNeeded;
-      const pct = Math.min(100, Math.round((done / needed) * 100));
-      const gateDiv = document.createElement('div');
+  tiersReversed.forEach(function(tier) {
+    var tierOrigIdx = CURRICULUM.tiers.indexOf(tier);
+    var tierUnlocked = isTierUnlocked(tier);
+
+    // Build tier section with modules in reverse (so M1 is at bottom of its section)
+    var reversedMods = tier.modules.slice().reverse();
+    var section = document.createElement('section');
+    section.className = 'tier-section ' + tier.cssClass;
+
+    var nodesHtml = reversedMods.map(function(mod) {
+      var prog = getModuleProgress(mod);
+      var modUnlocked = tierUnlocked && isModuleUnlocked(tier, mod);
+      var isComplete = prog.done === prog.total;
+      var isActive = modUnlocked && !isComplete && prog.done > 0;
+      var nodeClass = 'module-node' +
+        (!modUnlocked ? ' locked' : isComplete ? ' completed' : isActive ? ' active' : '');
+      var dots = mod.lessons.map(function(l) {
+        return '<div class="module-node-lesson-dot' + (isLessonComplete(l.id) ? ' done' : '') + '"></div>';
+      }).join('');
+      return '<div class="module-node-wrapper">' +
+        '<div class="' + nodeClass + '" data-mod-id="' + mod.id + '" data-tier-id="' + tier.id + '"' +
+        ' tabindex="' + (modUnlocked ? 0 : -1) + '" role="button" aria-label="' + mod.title + '">' +
+        '<div class="module-node-circle">' + mod.icon +
+        (!modUnlocked ? '<div class="module-node-lock">\uD83D\uDCD2</div>' : '') +
+        (isComplete ? '<div class="module-node-check">\u2713</div>' : '') +
+        '</div>' +
+        '<div class="module-node-info">' +
+        '<div class="module-node-title">' + mod.title + '</div>' +
+        '<div class="module-node-meta">' + prog.done + '/' + prog.total + ' lessons' + (isComplete ? ' \u00B7 Complete' : '') + '</div>' +
+        '<div class="module-node-lessons-bar">' + dots + '</div>' +
+        '</div></div></div>';
+    }).join('');
+
+    section.innerHTML =
+      '<div class="tier-banner"><div class="tier-banner-inner">' +
+      '<div class="tier-badge">' + tier.icon + ' Tier ' + (tierOrigIdx + 1) + ' \u2013 ' + tier.name + '</div>' +
+      '<h2 class="tier-title">' + tier.name + '</h2>' +
+      '<p class="tier-subtitle">' + tier.grade + ' \u00B7 ' + tier.description.substring(0, 80) + '\u2026</p>' +
+      '</div></div>' +
+      '<div class="tier-nodes-wrapper">' +
+      '<div class="path-line"><div class="path-line-fill" id="path-fill-' + tier.id + '"></div></div>' +
+      nodesHtml +
+      '</div>';
+
+    container.appendChild(section);
+
+    // Gate appears AFTER the tier in DOM (visually above it when reading bottom-to-top)
+    // Gate belongs to this tier (T2 gate, T3 gate) and shows what T1/T2 must be completed
+    if (tier.unlockRequirement) {
+      var req = tier.unlockRequirement;
+      var srcTier = CURRICULUM.tiers.find(function(t) { return t.id === req.tier; });
+      var done = getTierCompletedModules(srcTier);
+      var needed = req.modulesNeeded;
+      var pct = Math.min(100, Math.round((done / needed) * 100));
+      var gateDiv = document.createElement('div');
       gateDiv.className = 'tier-gate' + (tierUnlocked ? ' unlocked' : '');
-      gateDiv.innerHTML = `
-        <div class="tier-gate-line"></div>
-        <div class="tier-gate-card">
-          <div class="tier-gate-icon">${tierUnlocked ? '📓' : '📒'}</div>
-          <div class="tier-gate-title">${tierUnlocked ? tier.name + ' Tier Unlocked!' : 'Unlock ' + tier.name}</div>
-          <div class="tier-gate-desc">${tierUnlocked
-            ? 'You\'ve completed enough modules to access ' + tier.grade + '.'
-            : 'Complete ' + needed + ' modules in ' + srcTier.name + ' to unlock ' + tier.grade + '.'
-          }</div>
-          ${!tierUnlocked ? `
-          <div class="tier-gate-progress">
-            <div class="tier-gate-track"><div class="tier-gate-fill t${ti+1}" style="width:${pct}%"></div></div>
-            <span class="tier-gate-text">${done}/${needed} modules</span>
-          </div>` : ''}
-        </div>
-      `;
+      gateDiv.innerHTML =
+        '<div class="tier-gate-line"></div>' +
+        '<div class="tier-gate-card">' +
+        '<div class="tier-gate-icon">' + (tierUnlocked ? '\uD83D\uDCD3' : '\uD83D\uDCD2') + '</div>' +
+        '<div class="tier-gate-title">' + (tierUnlocked ? tier.name + ' Tier Unlocked!' : 'Unlock ' + tier.name) + '</div>' +
+        '<div class="tier-gate-desc">' + (tierUnlocked
+          ? 'You\'ve completed enough modules to access ' + tier.grade + '.'
+          : 'Complete ' + needed + ' of ' + srcTier.modules.length + ' modules in ' + srcTier.name + ' to unlock ' + tier.grade + '.') +
+        '</div>' +
+        (!tierUnlocked ? '<div class="tier-gate-progress"><div class="tier-gate-track"><div class="tier-gate-fill t' + (tierOrigIdx + 1) + '" style="width:' + pct + '%"></div></div><span class="tier-gate-text">' + done + '/' + needed + ' modules</span></div>' : '') +
+        '</div>';
       container.appendChild(gateDiv);
     }
-
-    // Tier section
-    const section = document.createElement('section');
-    section.className = `tier-section ${tier.cssClass}`;
-    section.innerHTML = `
-      <div class="tier-banner">
-        <div class="tier-banner-inner">
-          <div class="tier-badge">${tier.icon} Tier ${ti + 1} – ${tier.name}</div>
-          <h2 class="tier-title">${tier.name}</h2>
-          <p class="tier-subtitle">${tier.grade} Â· ${tier.description.substring(0, 80)}…</p>
-        </div>
-      </div>
-      <div class="tier-nodes-wrapper">
-        <div class="path-line"><div class="path-line-fill" id="path-fill-${tier.id}"></div></div>
-        ${tier.modules.map((mod, mi) => {
-          const prog = getModuleProgress(mod);
-          const modUnlocked = tierUnlocked && isModuleUnlocked(tier, mod);
-          const isComplete = prog.done === prog.total;
-          const isActive = modUnlocked && !isComplete && prog.done > 0;
-          const dotClasses = mod.lessons.map(l => isLessonComplete(l.id) ? 'module-node-lesson-dot done' : 'module-node-lesson-dot').join('"><div class="');
-          let nodeClass = 'module-node';
-          if (!modUnlocked) nodeClass += ' locked';
-          else if (isComplete) nodeClass += ' completed';
-          else if (isActive) nodeClass += ' active';
-
-          return `
-          <div class="module-node-wrapper">
-            <div class="${nodeClass}" data-mod-id="${mod.id}" data-tier-id="${tier.id}" tabindex="${modUnlocked ? 0 : -1}" role="button" aria-label="${mod.title}">
-              <div class="module-node-circle">
-                ${mod.icon}
-                ${!modUnlocked ? '<div class="module-node-lock">📒</div>' : ''}
-                ${isComplete ? '<div class="module-node-check">✓</div>' : ''}
-              </div>
-              <div class="module-node-info">
-                <div class="module-node-title">${mod.title}</div>
-                <div class="module-node-meta">${prog.done}/${prog.total} lessons${isComplete ? ' Â· Complete' : ''}</div>
-                <div class="module-node-lessons-bar">
-                  <div class="${dotClasses}"></div>
-                </div>
-              </div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-    `;
-    container.appendChild(section);
   });
 
   // Animate path fills
-  requestAnimationFrame(() => {
-    CURRICULUM.tiers.forEach(tier => {
-      const fillEl = document.getElementById('path-fill-' + tier.id);
+  requestAnimationFrame(function() {
+    CURRICULUM.tiers.forEach(function(tier) {
+      var fillEl = document.getElementById('path-fill-' + tier.id);
       if (!fillEl) return;
-      const total = tier.modules.length;
-      const done = getTierCompletedModules(tier);
-      const pct = total ? Math.round((done / total) * 100) : 0;
-      setTimeout(() => { fillEl.style.height = pct + '%'; }, 300);
+      var total = tier.modules.length;
+      var done = getTierCompletedModules(tier);
+      var pct = total ? Math.round((done / total) * 100) : 0;
+      setTimeout(function() { fillEl.style.height = pct + '%'; }, 300);
     });
   });
 
   // Attach click handlers
-  container.querySelectorAll('.module-node:not(.locked)').forEach(node => {
-    node.addEventListener('click', () => {
-      const modId = node.dataset.modId;
-      const tierId = node.dataset.tierId;
-      openModuleOverview(tierId, modId);
+  container.querySelectorAll('.module-node:not(.locked)').forEach(function(node) {
+    node.addEventListener('click', function() {
+      openModuleOverview(node.dataset.tierId, node.dataset.modId);
     });
-    node.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        node.click();
-      }
+    node.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); node.click(); }
     });
   });
 }
@@ -3045,6 +3041,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var resetBtn = document.getElementById('reset-progress-btn');
   if (resetBtn) resetBtn.addEventListener('click', resetState);
+
+  // Scroll to bottom so the user sees the start (T1 Module 1) first
+  setTimeout(function() {
+    var path = document.getElementById('curriculum-path');
+    if (path) path.lastElementChild && path.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }, 150);
 
   // Scroll reveal for path nodes
   var obs = new IntersectionObserver(function(entries) {
