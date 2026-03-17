@@ -161,8 +161,8 @@ function getTierCompletedModules(tier) {
 }
 function isTierUnlocked(tier) {
   if (!tier.unlockRequirement) return true;
-  const srcTier = CURRICULUM.tiers.find(t => t.id === tier.unlockRequirement.tier);
-  return srcTier ? getTierCompletedModules(srcTier) >= tier.unlockRequirement.modulesNeeded : false;
+  var srcTier = CURRICULUM.tiers.find(function(t) { return t.id === tier.unlockRequirement.tier; });
+  return srcTier ? getTierCompletedModules(srcTier) >= srcTier.modules.length : false;
 }
 function isModuleUnlocked(tier, mod) {
   if (!isTierUnlocked(tier)) return false;
@@ -171,6 +171,17 @@ function isModuleUnlocked(tier, mod) {
   const prev = tier.modules[modIdx - 1];
   const prevProg = getModuleProgress(prev);
   return prevProg.done === prevProg.total;
+}
+function isLessonUnlocked(tier, mod, lessonIdx) {
+  if (!isTierUnlocked(tier)) return false;
+  // Flat list of all lessons in tier order
+  var flat = [];
+  tier.modules.forEach(function(m) {
+    m.lessons.forEach(function(l, li) { flat.push({ id: l.id, modId: m.id, li: li }); });
+  });
+  var pos = flat.findIndex(function(x) { return x.modId === mod.id && x.li === lessonIdx; });
+  if (pos <= 0) return true;
+  return isLessonComplete(flat[pos - 1].id);
 }
 function getTotalLessons() {
   return CURRICULUM.tiers.reduce((a, t) => a + t.modules.reduce((b, m) => b + m.lessons.length, 0), 0);
@@ -210,47 +221,53 @@ function renderPath() {
   if (!container) return;
   container.innerHTML = '';
 
-  // Render bottom-to-top: T3 first in DOM, T1 last (so T1 M1 sits at the bottom = start)
+  // Bottom-to-top: T3 first in DOM, T1 last → T1 L1 sits at very bottom (the start)
   var tiersReversed = CURRICULUM.tiers.slice().reverse();
 
   tiersReversed.forEach(function(tier) {
     var tierOrigIdx = CURRICULUM.tiers.indexOf(tier);
     var tierUnlocked = isTierUnlocked(tier);
-
-    // Build tier section with modules in reverse (so M1 is at bottom of its section)
-    var reversedMods = tier.modules.slice().reverse();
     var section = document.createElement('section');
     section.className = 'tier-section ' + tier.cssClass;
 
-    var nodesHtml = reversedMods.map(function(mod) {
-      var prog = getModuleProgress(mod);
-      var modUnlocked = tierUnlocked && isModuleUnlocked(tier, mod);
-      var isComplete = prog.done === prog.total;
-      var isActive = modUnlocked && !isComplete && prog.done > 0;
-      var nodeClass = 'module-node' +
-        (!modUnlocked ? ' locked' : isComplete ? ' completed' : isActive ? ' active' : '');
-      var dots = mod.lessons.map(function(l) {
-        return '<div class="module-node-lesson-dot' + (isLessonComplete(l.id) ? ' done' : '') + '"></div>';
+    // Modules reversed so M1 is at bottom; within each module lessons reversed so L1 at bottom
+    var nodesHtml = tier.modules.slice().reverse().map(function(mod) {
+      var modProg = getModuleProgress(mod);
+      var modComplete = modProg.done === modProg.total;
+
+      var lessonsHtml = mod.lessons.slice().reverse().map(function(lesson) {
+        var li = mod.lessons.indexOf(lesson);
+        var unlocked = isLessonUnlocked(tier, mod, li);
+        var done = isLessonComplete(lesson.id);
+        var cls = 'lesson-node' + (!unlocked ? ' locked' : done ? ' completed' : '');
+        return '<div class="lesson-node-wrapper">' +
+          '<div class="' + cls + '"' +
+          ' data-tier-id="' + tier.id + '" data-mod-id="' + mod.id + '" data-lesson-idx="' + li + '"' +
+          ' tabindex="' + (unlocked ? 0 : -1) + '" role="button" aria-label="' + lesson.title + '">' +
+          '<div class="lesson-node-circle">' +
+          (done ? '<span class="lesson-node-check">\u2713</span>' : (!unlocked ? '\uD83D\uDD12' : lesson.icon)) +
+          '</div>' +
+          '<div class="lesson-node-label">' + lesson.title + '</div>' +
+          '</div></div>';
       }).join('');
-      return '<div class="module-node-wrapper">' +
-        '<div class="' + nodeClass + '" data-mod-id="' + mod.id + '" data-tier-id="' + tier.id + '"' +
-        ' tabindex="' + (modUnlocked ? 0 : -1) + '" role="button" aria-label="' + mod.title + '">' +
-        '<div class="module-node-circle">' + mod.icon +
-        (!modUnlocked ? '<div class="module-node-lock">\uD83D\uDCD2</div>' : '') +
-        (isComplete ? '<div class="module-node-check">\u2713</div>' : '') +
+
+      return '<div class="mod-group">' +
+        '<div class="mod-group-header">' +
+        '<div class="mod-group-line"></div>' +
+        '<div class="mod-group-pill' + (modComplete ? ' complete' : '') + '">' +
+        mod.icon + ' <span>' + mod.title + '</span>' +
+        '<span class="mod-group-count">' + modProg.done + '/' + modProg.total + '</span>' +
         '</div>' +
-        '<div class="module-node-info">' +
-        '<div class="module-node-title">' + mod.title + '</div>' +
-        '<div class="module-node-meta">' + prog.done + '/' + prog.total + ' lessons' + (isComplete ? ' \u00B7 Complete' : '') + '</div>' +
-        '<div class="module-node-lessons-bar">' + dots + '</div>' +
-        '</div></div></div>';
+        '<div class="mod-group-line"></div>' +
+        '</div>' +
+        lessonsHtml +
+        '</div>';
     }).join('');
 
     section.innerHTML =
       '<div class="tier-banner"><div class="tier-banner-inner">' +
-      '<div class="tier-badge">' + tier.icon + ' Tier ' + (tierOrigIdx + 1) + ' \u2013 ' + tier.name + '</div>' +
+      '<div class="tier-badge">' + tier.icon + ' ' + tier.name + '</div>' +
       '<h2 class="tier-title">' + tier.name + '</h2>' +
-      '<p class="tier-subtitle">' + tier.grade + ' \u00B7 ' + tier.description.substring(0, 80) + '\u2026</p>' +
       '</div></div>' +
       '<div class="tier-nodes-wrapper">' +
       '<div class="path-line"><div class="path-line-fill" id="path-fill-' + tier.id + '"></div></div>' +
@@ -259,47 +276,53 @@ function renderPath() {
 
     container.appendChild(section);
 
-    // Gate appears AFTER the tier in DOM (visually above it when reading bottom-to-top)
-    // Gate belongs to this tier (T2 gate, T3 gate) and shows what T1/T2 must be completed
+    // Tier gate (shown above this tier, below the tier that must be completed first)
     if (tier.unlockRequirement) {
-      var req = tier.unlockRequirement;
-      var srcTier = CURRICULUM.tiers.find(function(t) { return t.id === req.tier; });
-      var done = getTierCompletedModules(srcTier);
-      var needed = req.modulesNeeded;
-      var pct = Math.min(100, Math.round((done / needed) * 100));
+      var srcTier = CURRICULUM.tiers.find(function(t) { return t.id === tier.unlockRequirement.tier; });
+      var doneCount = getTierCompletedModules(srcTier);
+      var totalNeeded = srcTier.modules.length;
+      var pct = Math.min(100, Math.round((doneCount / totalNeeded) * 100));
       var gateDiv = document.createElement('div');
       gateDiv.className = 'tier-gate' + (tierUnlocked ? ' unlocked' : '');
       gateDiv.innerHTML =
         '<div class="tier-gate-line"></div>' +
         '<div class="tier-gate-card">' +
-        '<div class="tier-gate-icon">' + (tierUnlocked ? '\uD83D\uDCD3' : '\uD83D\uDCD2') + '</div>' +
-        '<div class="tier-gate-title">' + (tierUnlocked ? tier.name + ' Tier Unlocked!' : 'Unlock ' + tier.name) + '</div>' +
+        '<div class="tier-gate-icon">' + (tierUnlocked ? '\u2605' : '\uD83D\uDD12') + '</div>' +
+        '<div class="tier-gate-title">' + (tierUnlocked ? tier.name + ' Unlocked!' : tier.name + ' locked') + '</div>' +
         '<div class="tier-gate-desc">' + (tierUnlocked
-          ? 'You\'ve completed enough modules to access ' + tier.grade + '.'
-          : 'Complete ' + needed + ' of ' + srcTier.modules.length + ' modules in ' + srcTier.name + ' to unlock ' + tier.grade + '.') +
+          ? 'All ' + srcTier.name + ' modules complete. ' + tier.name + ' is now open.'
+          : 'Complete all ' + totalNeeded + ' ' + srcTier.name + ' modules to continue.') +
         '</div>' +
-        (!tierUnlocked ? '<div class="tier-gate-progress"><div class="tier-gate-track"><div class="tier-gate-fill t' + (tierOrigIdx + 1) + '" style="width:' + pct + '%"></div></div><span class="tier-gate-text">' + done + '/' + needed + ' modules</span></div>' : '') +
+        (!tierUnlocked
+          ? '<div class="tier-gate-progress"><div class="tier-gate-track"><div class="tier-gate-fill t' + (tierOrigIdx + 1) + '" style="width:' + pct + '%"></div></div>' +
+            '<span class="tier-gate-text">' + doneCount + '/' + totalNeeded + ' modules</span></div>'
+          : '') +
         '</div>';
       container.appendChild(gateDiv);
     }
   });
 
-  // Animate path fills
+  // Animate path fills (based on lesson completion within each tier)
   requestAnimationFrame(function() {
     CURRICULUM.tiers.forEach(function(tier) {
       var fillEl = document.getElementById('path-fill-' + tier.id);
       if (!fillEl) return;
-      var total = tier.modules.length;
-      var done = getTierCompletedModules(tier);
-      var pct = total ? Math.round((done / total) * 100) : 0;
+      var totalLessons = tier.modules.reduce(function(a, m) { return a + m.lessons.length; }, 0);
+      var doneLessons  = tier.modules.reduce(function(a, m) {
+        return a + m.lessons.filter(function(l) { return isLessonComplete(l.id); }).length;
+      }, 0);
+      var pct = totalLessons ? Math.round((doneLessons / totalLessons) * 100) : 0;
       setTimeout(function() { fillEl.style.height = pct + '%'; }, 300);
     });
   });
 
-  // Attach click handlers
-  container.querySelectorAll('.module-node:not(.locked)').forEach(function(node) {
+  // Lesson bubble click handlers
+  container.querySelectorAll('.lesson-node:not(.locked)').forEach(function(node) {
     node.addEventListener('click', function() {
-      openModuleOverview(node.dataset.tierId, node.dataset.modId);
+      var tier = CURRICULUM.tiers.find(function(t) { return t.id === node.dataset.tierId; });
+      var mod  = tier && tier.modules.find(function(m) { return m.id === node.dataset.modId; });
+      var li   = parseInt(node.dataset.lessonIdx, 10);
+      if (tier && mod) openLesson(tier, mod, li);
     });
     node.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); node.click(); }
@@ -3039,8 +3062,51 @@ document.addEventListener('DOMContentLoaded', function() {
   updateXPBar();
   renderPath();
 
-  var resetBtn = document.getElementById('reset-progress-btn');
-  if (resetBtn) resetBtn.addEventListener('click', resetState);
+  // Reset with confirmation modal
+  var resetBtn     = document.getElementById('reset-progress-btn');
+  var resetOverlay = document.getElementById('reset-confirm-overlay');
+  var resetInput   = document.getElementById('reset-confirm-input');
+  var resetConfirm = document.getElementById('reset-confirm-ok');
+  var resetCancel  = document.getElementById('reset-confirm-cancel');
+  var RESET_PHRASE = 'i want to reset';
+
+  if (resetBtn && resetOverlay) {
+    resetBtn.addEventListener('click', function() {
+      resetOverlay.removeAttribute('hidden');
+      resetInput.value = '';
+      resetConfirm.disabled = true;
+      resetInput.focus();
+    });
+    resetInput.addEventListener('input', function() {
+      resetConfirm.disabled = resetInput.value.trim().toLowerCase() !== RESET_PHRASE;
+    });
+    resetConfirm.addEventListener('click', function() {
+      resetOverlay.setAttribute('hidden', '');
+      resetState();
+    });
+    resetCancel.addEventListener('click', function() {
+      resetOverlay.setAttribute('hidden', '');
+    });
+    resetOverlay.addEventListener('click', function(e) {
+      if (e.target === resetOverlay) resetOverlay.setAttribute('hidden', '');
+    });
+  }
+
+  // Start Curriculum button: hide splash, reveal path, scroll to bottom (T1 start)
+  var startBtn = document.getElementById('curr-start-btn');
+  var splash   = document.getElementById('curr-splash');
+  var pathView = document.getElementById('curr-path-view');
+  if (startBtn && splash && pathView) {
+    startBtn.addEventListener('click', function() {
+      splash.style.transition = 'opacity 0.4s ease';
+      splash.style.opacity = '0';
+      setTimeout(function() {
+        splash.hidden = true;
+        pathView.removeAttribute('hidden');
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }, 380);
+    });
+  }
 
   // Scroll to bottom so the user sees the start (T1 Module 1) first
   setTimeout(function() {
@@ -3061,7 +3127,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
 
   setTimeout(function() {
-    document.querySelectorAll('.module-node').forEach(function(node, i) {
+    document.querySelectorAll('.lesson-node').forEach(function(node, i) {
       node.style.opacity = '0';
       node.style.transform = 'translateY(20px)';
       node.style.transition = 'opacity 0.5s ' + (i * 0.08) + 's, transform 0.5s ' + (i * 0.08) + 's';

@@ -14,51 +14,111 @@
 <body class="curriculum-page">
   <div id="navbar-placeholder"></div>
 
-  <!-- ======== HERO ======== -->
-  <section class="curr-hero">
-    <div class="curr-hero-bg"></div>
-    <div class="container curr-hero-inner">
-      <div class="curr-hero-badge">Interactive Learning Path</div>
-      <h1 class="curr-hero-title">Health Sciences<br><em class="curr-hero-em">Curriculum</em></h1>
-      <p class="curr-hero-sub">Three tiers · Nine modules · Real simulations.<br>Every concept is <strong>earned through interaction</strong>, then labeled with vocabulary.</p>
-      <div class="curr-hero-stats">
-        <div class="curr-stat"><span class="curr-stat-num">9</span><span class="curr-stat-label">Modules</span></div>
-        <div class="curr-stat-div"></div>
-        <div class="curr-stat"><span class="curr-stat-num">45+</span><span class="curr-stat-label">Lessons</span></div>
-        <div class="curr-stat-div"></div>
-        <div class="curr-stat"><span class="curr-stat-num">K–8</span><span class="curr-stat-label">Grade Range</span></div>
+  <!-- ======== LANDING SPLASH ======== -->
+  <section class="curr-splash" id="curr-splash">
+    <div class="curr-splash-bg"></div>
+    <div class="curr-splash-orb curr-splash-orb-1"></div>
+    <div class="curr-splash-orb curr-splash-orb-2"></div>
+    <div class="curr-splash-orb curr-splash-orb-3"></div>
+
+    <div class="container curr-splash-inner">
+      <div class="curr-splash-badge">Interactive Learning Path</div>
+
+      <h1 class="curr-splash-title">
+        Master<br>
+        <em class="curr-splash-em">Health Sciences</em>
+      </h1>
+
+      <p class="curr-splash-sub">
+        Three tiers &middot; Nine modules &middot; Real simulations.<br>
+        Every concept is <strong>earned through interaction</strong>.
+      </p>
+
+      <div class="curr-splash-stats">
+        <div class="curr-splash-stat">
+          <span class="curr-splash-stat-num">9</span>
+          <span class="curr-splash-stat-label">Modules</span>
+        </div>
+        <div class="curr-splash-stat-div"></div>
+        <div class="curr-splash-stat">
+          <span class="curr-splash-stat-num">45+</span>
+          <span class="curr-splash-stat-label">Lessons</span>
+        </div>
+        <div class="curr-splash-stat-div"></div>
+        <div class="curr-splash-stat">
+          <span class="curr-splash-stat-num">K–8</span>
+          <span class="curr-splash-stat-label">Grades</span>
+        </div>
       </div>
+
+      <!-- Tier preview cards -->
+      <div class="curr-tier-cards">
+        <div class="curr-tier-card curr-tier-card-t1">
+          <div class="curr-tier-card-icon">🌱</div>
+          <div class="curr-tier-card-body">
+            <div class="curr-tier-card-name">Foundation</div>
+            <div class="curr-tier-card-grade">Grades 4–5</div>
+          </div>
+        </div>
+        <div class="curr-tier-card-arrow">→</div>
+        <div class="curr-tier-card curr-tier-card-t2">
+          <div class="curr-tier-card-icon">🔬</div>
+          <div class="curr-tier-card-body">
+            <div class="curr-tier-card-name">Intermediate</div>
+            <div class="curr-tier-card-grade">Grades 6–7</div>
+          </div>
+        </div>
+        <div class="curr-tier-card-arrow">→</div>
+        <div class="curr-tier-card curr-tier-card-t3">
+          <div class="curr-tier-card-icon">🏆</div>
+          <div class="curr-tier-card-body">
+            <div class="curr-tier-card-name">Advanced</div>
+            <div class="curr-tier-card-grade">Grade 8</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="curr-start-btn" id="curr-start-btn">
+        <span class="curr-start-btn-text">Start Curriculum</span>
+        <span class="curr-start-btn-arrow">↓</span>
+      </button>
+
+      <p class="curr-splash-hint">Scroll down to continue your progress anytime</p>
     </div>
   </section>
 
-  <!-- ======== XP BAR ======== -->
-  <div class="curr-xp-bar" id="xp-bar">
-    <div class="container curr-xp-inner">
-      <div class="curr-xp-left">
-        <span class="curr-xp-icon">⚡</span>
-        <span class="curr-xp-label">XP: <strong id="xp-count">0</strong></span>
-      </div>
-      <div class="curr-xp-mid">
-        <div class="curr-progress-track">
-          <div class="curr-progress-fill" id="overall-progress-fill" style="width:0%"></div>
+  <!-- ======== PATH VIEW (hidden until Start is clicked) ======== -->
+  <div class="curr-path-view" id="curr-path-view" hidden>
+
+    <!-- XP BAR -->
+    <div class="curr-xp-bar" id="xp-bar">
+      <div class="container curr-xp-inner">
+        <div class="curr-xp-left">
+          <span class="curr-xp-icon">⚡</span>
+          <span class="curr-xp-label">XP: <strong id="xp-count">0</strong></span>
         </div>
-        <span class="curr-xp-pct" id="overall-progress-pct">0% complete</span>
-      </div>
-      <div class="curr-xp-right">
-        <button class="curr-reset-btn" id="reset-progress-btn" title="Reset progress">↺ Reset</button>
+        <div class="curr-xp-mid">
+          <div class="curr-progress-track">
+            <div class="curr-progress-fill" id="overall-progress-fill" style="width:0%"></div>
+          </div>
+          <span class="curr-xp-pct" id="overall-progress-pct">0% complete</span>
+        </div>
+        <div class="curr-xp-right">
+          <button class="curr-reset-btn" id="reset-progress-btn" title="Reset progress">↺ Reset</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ======== LEARNING PATH ======== -->
-  <main class="curr-path" id="curriculum-path">
-    <!-- Populated by curriculum.js -->
-  </main>
+    <!-- LEARNING PATH -->
+    <main class="curr-path" id="curriculum-path">
+      <!-- Populated by curriculum.js -->
+    </main>
+
+  </div>
 
   <!-- ======== LESSON MODAL ======== -->
   <div class="lesson-overlay" id="lesson-overlay" aria-modal="true" role="dialog" aria-label="Lesson" hidden>
     <div class="lesson-modal" id="lesson-modal">
-      <!-- Header -->
       <div class="lesson-header" id="lesson-header">
         <div class="lesson-header-left">
           <button class="lesson-close-btn" id="lesson-close-btn" aria-label="Close lesson">✕</button>
@@ -69,9 +129,7 @@
           <span class="lesson-xp-badge" id="lesson-xp-badge">+10 XP</span>
         </div>
       </div>
-      <!-- Content -->
       <div class="lesson-content" id="lesson-content"></div>
-      <!-- Footer -->
       <div class="lesson-footer" id="lesson-footer">
         <button class="lesson-back-btn" id="lesson-back-btn">← Back</button>
         <button class="lesson-continue-btn" id="lesson-continue-btn">Continue →</button>
@@ -84,6 +142,21 @@
     <div class="module-modal" id="module-modal">
       <button class="lesson-close-btn module-close-btn" id="module-close-btn">✕</button>
       <div id="module-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ======== RESET CONFIRMATION ======== -->
+  <div class="reset-overlay" id="reset-confirm-overlay" hidden>
+    <div class="reset-modal">
+      <div class="reset-modal-icon">⚠️</div>
+      <h3 class="reset-modal-title">Reset all progress?</h3>
+      <p class="reset-modal-desc">This will erase all completed lessons and XP. This cannot be undone.</p>
+      <p class="reset-modal-prompt">Type <strong>i want to reset</strong> to confirm:</p>
+      <input class="reset-modal-input" id="reset-confirm-input" type="text" placeholder="i want to reset" autocomplete="off" spellcheck="false">
+      <div class="reset-modal-actions">
+        <button class="reset-modal-cancel" id="reset-confirm-cancel">Cancel</button>
+        <button class="reset-modal-confirm" id="reset-confirm-ok" disabled>Reset Progress</button>
+      </div>
     </div>
   </div>
 
