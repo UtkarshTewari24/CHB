@@ -2,82 +2,246 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Meet the team behind Community Health Bridge.">
-  <title>Team — Community Health Bridge</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Meet the team behind Community Health Bridge.">
+
+<title>Team — Community Health Bridge</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+/* TEAM GRID */
+
+.team-grid{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:28px;
+margin-top:50px;
+}
+
+/* TEAM CARD */
+
+.team-card{
+text-align:center;
+padding:32px 24px;
+border-radius:18px;
+transition:transform .25s ease, box-shadow .25s ease;
+}
+
+.team-card:hover{
+transform:translateY(-6px);
+}
+
+/* EMOJI AVATAR */
+
+.team-avatar{
+font-size:48px;
+margin-bottom:14px;
+}
+
+/* NAME */
+
+.team-card h3{
+margin-bottom:6px;
+}
+
+/* ROLE */
+
+.team-role{
+font-size:.9rem;
+font-weight:600;
+color:var(--teal-muted);
+margin-bottom:12px;
+}
+
+/* BIO */
+
+.team-bio{
+font-size:.9rem;
+line-height:1.6;
+opacity:.85;
+}
+
+/* TABLET */
+
+@media (max-width:1100px){
+
+.team-grid{
+grid-template-columns:repeat(3,1fr);
+}
+
+}
+
+/* SMALL TABLET */
+
+@media (max-width:750px){
+
+.team-grid{
+grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+/* MOBILE */
+
+@media (max-width:480px){
+
+.team-grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
 </head>
 
 <body>
-  <div id="navbar-placeholder"></div>
 
-  <section class="page-hero">
-    <div class="container">
-      <span class="label label--light">Our People</span>
-      <h1>The Team</h1>
-      <p class="subtitle" style="color: rgba(255,255,255,0.5);">The people behind the mission — <em
-          style="color: var(--teal-muted);">dedicated to making a difference</em>.</p>
-    </div>
-  </section>
+<div id="navbar-placeholder"></div>
 
-  <section class="section section--tinted">
-    <div class="container">
-      <div class="team-grid">
-        <div class="team-card glass-card reveal delay-1">
-          <div class="team-avatar">👤</div>
-          <h3>Person 1</h3>
-          <div class="team-role">N/A</div>
-          <p class="team-bio">N/A</p>
-        </div>
-        <div class="team-card glass-card reveal delay-2">
-          <div class="team-avatar">👤</div>
-          <h3>Person 2</h3>
-          <div class="team-role">N/A</div>
-          <p class="team-bio">N/A</p>
-        </div>
-        <div class="team-card glass-card reveal delay-3">
-          <div class="team-avatar">👤</div>
-          <h3>Person 3</h3>
-          <div class="team-role">N/A</div>
-          <p class="team-bio">N/A</p>
-        </div>
-        <div class="team-card glass-card reveal delay-4">
-          <div class="team-avatar">👤</div>
-          <h3>Person 4</h3>
-          <div class="team-role">N/A</div>
-          <p class="team-bio">N/A</p>
-        </div>
-        <div class="team-card glass-card reveal" style="transition-delay: 0.4s;">
-          <div class="team-avatar">👤</div>
-          <h3>Person 5</h3>
-          <div class="team-role">N/A</div>
-          <p class="team-bio">N/A</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="cta-banner">
-    <div class="container reveal">
-      <h2>Interested in joining?</h2>
-      <p>We're building a team of people who care about youth health education.</p>
-      <div class="btn-group">
-        <a href="volunteer.html" class="btn btn--white">Volunteer</a>
-        <a href="signup.html" class="btn btn--glass">Contact Us</a>
-      </div>
-    </div>
-  </section>
+<section class="page-hero">
+<div class="container">
 
-  <div id="footer-placeholder"></div>
-  <script src="components.js"></script>
-  <script>loadComponents('team');</script>
-  <script src="script.js"></script>
+<span class="label label--light">Our People</span>
+
+<h1>The Team</h1>
+
+<p class="subtitle" style="color:rgba(255,255,255,0.5);">
+The people behind the mission —
+<em style="color:var(--teal-muted);">dedicated to making a difference</em>.
+</p>
+
+</div>
+</section>
+
+
+<section class="section section--tinted">
+
+<div class="container">
+
+<div class="team-grid">
+
+<div class="team-card glass-card reveal delay-1">
+
+<div class="team-avatar">⚙️</div>
+
+<h3>Shreyas Kedarisetty</h3>
+
+<div class="team-role">Co-Founder & Operations Manager</div>
+
+<p class="team-bio">
+Shreyas oversees the operations of Community Health Bridge and ensures that projects move smoothly from idea to impact. As a co-founder, he coordinates planning, logistics, and team collaboration so initiatives can reach communities efficiently and effectively.
+</p>
+
+</div>
+
+
+<div class="team-card glass-card reveal delay-2">
+
+<div class="team-avatar">💻</div>
+
+<h3>Utkarsh Tewari</h3>
+
+<div class="team-role">Co-Founder & Technical Lead</div>
+
+<p class="team-bio">
+Utkarsh leads the technical development behind Community Health Bridge. As a co-founder, he designs and maintains the organization’s digital platforms, helping deliver educational resources and tools that allow the initiative to reach more students online.
+</p>
+
+</div>
+
+
+<div class="team-card glass-card reveal delay-3">
+
+<div class="team-avatar">📝</div>
+
+<h3>Aayush Shah</h3>
+
+<div class="team-role">Co-Founder & Content Lead</div>
+
+<p class="team-bio">
+Aayush helps shape the educational voice of Community Health Bridge. As a co-founder and content lead, he focuses on turning complex health topics into clear and engaging materials that students and young audiences can easily understand.
+</p>
+
+</div>
+
+
+<div class="team-card glass-card reveal delay-4">
+
+<div class="team-avatar">📚</div>
+
+<h3>Krithin Kalakonda</h3>
+
+<div class="team-role">Co-Founder & Content Lead</div>
+
+<p class="team-bio">
+Krithin works on researching and developing educational content for Community Health Bridge. As a co-founder, he helps ensure that the organization’s resources are accurate, informative, and impactful for the communities it serves.
+</p>
+
+</div>
+
+
+<div class="team-card glass-card reveal" style="transition-delay:.4s;">
+
+<div class="team-avatar">🤝</div>
+
+<h3>Kasyap Ganjam</h3>
+
+<div class="team-role">Co-Founder & Outreach Lead</div>
+
+<p class="team-bio">
+Kasyap leads outreach and partnerships for Community Health Bridge. As a co-founder, he connects the organization with schools, volunteers, and community partners to expand the reach of its health education initiatives.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="cta-banner">
+
+<div class="container reveal">
+
+<h2>Interested in joining?</h2>
+
+<p>We're building a team of people who care about youth health education.</p>
+
+<div class="btn-group">
+
+<a href="volunteer.html" class="btn btn--white">Volunteer</a>
+
+<a href="signup.html" class="btn btn--glass">Contact Us</a>
+
+</div>
+
+</div>
+
+</section>
+
+
+<div id="footer-placeholder"></div>
+
+<script src="components.js"></script>
+
+<script>
+loadComponents('team');
+</script>
+
+<script src="script.js"></script>
+
 </body>
 
 </html>
