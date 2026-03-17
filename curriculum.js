@@ -150,6 +150,7 @@ function completeLesson(lessonId, xp) {
     STATE.xp += xp;
     saveState(); updateXPBar();
     showXPToast("+" + xp + " XP!");
+    updateModulePill();
   }
 }
 function getModuleProgress(mod) {
@@ -216,6 +217,38 @@ function showXPToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+function getCurrentModule() {
+  for (var ti = 0; ti < CURRICULUM.tiers.length; ti++) {
+    var tier = CURRICULUM.tiers[ti];
+    if (!isTierUnlocked(tier)) continue;
+    for (var mi = 0; mi < tier.modules.length; mi++) {
+      var mod = tier.modules[mi];
+      for (var li = 0; li < mod.lessons.length; li++) {
+        if (!isLessonComplete(mod.lessons[li].id) && isLessonUnlocked(tier, mod, li)) {
+          return { tier: tier, mod: mod };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function updateModulePill() {
+  var pill = document.getElementById('curr-module-pill');
+  if (!pill) return;
+  var current = getCurrentModule();
+  if (!current) {
+    document.getElementById('curr-module-pill-icon').textContent = '\uD83C\uDFC6';
+    document.getElementById('curr-module-pill-name').textContent = 'All complete!';
+    document.getElementById('curr-module-pill-prog').textContent = '';
+    return;
+  }
+  var prog = getModuleProgress(current.mod);
+  document.getElementById('curr-module-pill-icon').textContent = current.mod.icon;
+  document.getElementById('curr-module-pill-name').textContent = current.mod.title;
+  document.getElementById('curr-module-pill-prog').textContent = prog.done + '/' + prog.total;
+}
+
 function renderPath() {
   var container = document.getElementById('curriculum-path');
   if (!container) return;
@@ -232,9 +265,6 @@ function renderPath() {
 
     // Modules reversed so M1 is at bottom; within each module lessons reversed so L1 at bottom
     var nodesHtml = tier.modules.slice().reverse().map(function(mod) {
-      var modProg = getModuleProgress(mod);
-      var modComplete = modProg.done === modProg.total;
-
       var lessonsHtml = mod.lessons.slice().reverse().map(function(lesson) {
         var li = mod.lessons.indexOf(lesson);
         var unlocked = isLessonUnlocked(tier, mod, li);
@@ -251,17 +281,7 @@ function renderPath() {
           '</div></div>';
       }).join('');
 
-      return '<div class="mod-group">' +
-        '<div class="mod-group-header">' +
-        '<div class="mod-group-line"></div>' +
-        '<div class="mod-group-pill' + (modComplete ? ' complete' : '') + '">' +
-        mod.icon + ' <span>' + mod.title + '</span>' +
-        '<span class="mod-group-count">' + modProg.done + '/' + modProg.total + '</span>' +
-        '</div>' +
-        '<div class="mod-group-line"></div>' +
-        '</div>' +
-        lessonsHtml +
-        '</div>';
+      return '<div class="mod-group">' + lessonsHtml + '</div>';
     }).join('');
 
     section.innerHTML =
@@ -327,6 +347,30 @@ function renderPath() {
     node.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); node.click(); }
     });
+  });
+
+  updateModulePill();
+
+  // Update module pill as user scrolls through the path
+  var pillObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var node = entry.target;
+      var tier = CURRICULUM.tiers.find(function(t) { return t.id === node.dataset.tierId; });
+      var mod  = tier && tier.modules.find(function(m) { return m.id === node.dataset.modId; });
+      if (!mod) return;
+      var prog = getModuleProgress(mod);
+      var iconEl = document.getElementById('curr-module-pill-icon');
+      var nameEl = document.getElementById('curr-module-pill-name');
+      var progEl = document.getElementById('curr-module-pill-prog');
+      if (iconEl) iconEl.textContent = mod.icon;
+      if (nameEl) nameEl.textContent = mod.title;
+      if (progEl) progEl.textContent = prog.done + '/' + prog.total;
+    });
+  }, { threshold: 0.5, rootMargin: '-25% 0px -25% 0px' });
+
+  container.querySelectorAll('.lesson-node').forEach(function(node) {
+    pillObs.observe(node);
   });
 }
 
@@ -3103,6 +3147,10 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() {
         splash.hidden = true;
         pathView.removeAttribute('hidden');
+        var xpBar = document.getElementById('xp-bar');
+        var modPill = document.getElementById('curr-module-pill');
+        if (xpBar) xpBar.removeAttribute('hidden');
+        if (modPill) modPill.removeAttribute('hidden');
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       }, 380);
     });

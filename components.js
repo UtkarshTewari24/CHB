@@ -95,7 +95,8 @@ function getFooter() {
       </div>
 
       <div class="footer-bottom">
-        &copy; 2026 Community Health Bridge
+        <span>&copy; 2026 Community Health Bridge. All rights reserved.</span>
+        <span>Built for health education</span>
       </div>
     </div>
   </footer>`;

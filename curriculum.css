@@ -8,9 +8,66 @@
   color: #e2e8f0;
 }
 
+/* Hide the shared navbar entirely on curriculum page */
+.curriculum-page .navbar { display: none !important; }
+
 .curriculum-page .footer {
   background: #060a14;
   border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+/* XP bar: fixed at very top, full width */
+.curr-xp-bar {
+  position: fixed !important;
+  top: 0; left: 0; right: 0;
+  width: 100%;
+  z-index: 200;
+  background: rgba(10, 15, 30, 0.92) !important;
+  border-top: none !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.curr-xp-bar[hidden] { display: none !important; }
+
+/* Module indicator pill: fixed just below XP bar */
+.curr-module-pill {
+  position: fixed;
+  top: 53px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 199;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.curr-module-pill[hidden] { display: none !important; }
+.curr-module-pill-icon { font-size: 1rem; }
+.curr-module-pill-name { font-weight: 600; color: #e2e8f0; }
+.curr-module-pill-prog {
+  padding: 2px 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 100px;
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+/* Path view needs top padding for fixed bars */
+.curr-path-view {
+  padding-top: 100px;
+  animation: fadeIn 0.5s ease both;
 }
 
 /* ---------- Splash / Landing ---------- */
@@ -252,25 +309,9 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- Path view (revealed on Start click) ---------- */
-.curr-path-view {
-  animation: fadeIn 0.5s ease both;
-}
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
-}
-
-/* ---------- XP Bar ---------- */
-.curr-xp-bar {
-  background: rgba(255,255,255,0.03);
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding: 14px 0;
-  position: sticky;
-  top: 76px;
-  z-index: 90;
-  backdrop-filter: blur(16px);
 }
 
 .curr-xp-inner {
@@ -446,13 +487,8 @@
 .mod-group-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
   padding: 20px 0 12px;
-}
-.mod-group-line {
-  flex: 1;
-  height: 1px;
-  background: rgba(255,255,255,0.07);
 }
 .mod-group-pill {
   display: inline-flex;
@@ -505,7 +541,12 @@
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .lesson-node:hover:not(.locked) { transform: translateY(-4px); }
-.lesson-node.locked { cursor: not-allowed; opacity: 0.38; pointer-events: none; }
+.lesson-node.locked {
+  cursor: not-allowed;
+  opacity: 0.2;
+  pointer-events: none;
+  filter: grayscale(1);
+}
 
 .lesson-node-circle {
   width: 68px; height: 68px;
@@ -532,9 +573,6 @@
   background: linear-gradient(135deg, #0D9E75, #34d399);
   border-color: #34d399;
   box-shadow: 0 0 0 5px rgba(13,158,117,0.15), 0 4px 16px rgba(13,158,117,0.3);
-}
-.tier-t1 .lesson-node:not(.locked):not(.completed) ~ .lesson-node-wrapper:first-of-type .lesson-node-circle {
-  animation: nodePulse 2.2s infinite;
 }
 
 .tier-t2 .lesson-node-circle {
@@ -565,28 +603,59 @@
   box-shadow: 0 0 0 5px rgba(216,90,48,0.15), 0 4px 16px rgba(216,90,48,0.3);
 }
 
-/* Pulse on the next-to-complete lesson */
-.lesson-node:not(.locked):not(.completed) .lesson-node-circle {
-  animation: nodePulse 2.2s infinite;
+/* Current lesson (next-to-complete): bright glow pulse */
+.tier-t1 .lesson-node:not(.locked):not(.completed) .lesson-node-circle {
+  background: linear-gradient(135deg, #0a7a5a, #0D9E75) !important;
+  border-color: #34d399 !important;
+  animation: currentGlowT1 2s ease-in-out infinite;
+}
+@keyframes currentGlowT1 {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(13,158,117,0.7),
+                0 0 20px rgba(13,158,117,0.4),
+                0 0 40px rgba(13,158,117,0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(13,158,117,0),
+                0 0 30px rgba(13,158,117,0.6),
+                0 0 60px rgba(13,158,117,0.25);
+  }
 }
 
-@keyframes nodePulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(13,158,117,0.5); }
-  50%       { box-shadow: 0 0 0 10px rgba(13,158,117,0); }
-}
 .tier-t2 .lesson-node:not(.locked):not(.completed) .lesson-node-circle {
-  animation: nodePulseT2 2.2s infinite;
+  background: linear-gradient(135deg, #3730a3, #534AB7) !important;
+  border-color: #a78bfa !important;
+  animation: currentGlowT2 2s ease-in-out infinite;
 }
-@keyframes nodePulseT2 {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(83,74,183,0.5); }
-  50%       { box-shadow: 0 0 0 10px rgba(83,74,183,0); }
+@keyframes currentGlowT2 {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(83,74,183,0.7),
+                0 0 20px rgba(83,74,183,0.4),
+                0 0 40px rgba(83,74,183,0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(83,74,183,0),
+                0 0 30px rgba(83,74,183,0.6),
+                0 0 60px rgba(83,74,183,0.25);
+  }
 }
+
 .tier-t3 .lesson-node:not(.locked):not(.completed) .lesson-node-circle {
-  animation: nodePulseT3 2.2s infinite;
+  background: linear-gradient(135deg, #b83a18, #D85A30) !important;
+  border-color: #fb923c !important;
+  animation: currentGlowT3 2s ease-in-out infinite;
 }
-@keyframes nodePulseT3 {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(216,90,48,0.5); }
-  50%       { box-shadow: 0 0 0 10px rgba(216,90,48,0); }
+@keyframes currentGlowT3 {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(216,90,48,0.7),
+                0 0 20px rgba(216,90,48,0.4),
+                0 0 40px rgba(216,90,48,0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(216,90,48,0),
+                0 0 30px rgba(216,90,48,0.6),
+                0 0 60px rgba(216,90,48,0.25);
+  }
 }
 
 .lesson-node-check {

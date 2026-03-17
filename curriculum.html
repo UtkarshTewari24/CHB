@@ -87,33 +87,38 @@
     </div>
   </section>
 
-  <!-- ======== PATH VIEW (hidden until Start is clicked) ======== -->
-  <div class="curr-path-view" id="curr-path-view" hidden>
-
-    <!-- XP BAR -->
-    <div class="curr-xp-bar" id="xp-bar">
-      <div class="container curr-xp-inner">
-        <div class="curr-xp-left">
-          <span class="curr-xp-icon">⚡</span>
-          <span class="curr-xp-label">XP: <strong id="xp-count">0</strong></span>
+  <!-- XP BAR (fixed at top, shown when path is active) -->
+  <div class="curr-xp-bar" id="xp-bar" hidden>
+    <div class="container curr-xp-inner">
+      <div class="curr-xp-left">
+        <span class="curr-xp-icon">⚡</span>
+        <span class="curr-xp-label">XP: <strong id="xp-count">0</strong></span>
+      </div>
+      <div class="curr-xp-mid">
+        <div class="curr-progress-track">
+          <div class="curr-progress-fill" id="overall-progress-fill" style="width:0%"></div>
         </div>
-        <div class="curr-xp-mid">
-          <div class="curr-progress-track">
-            <div class="curr-progress-fill" id="overall-progress-fill" style="width:0%"></div>
-          </div>
-          <span class="curr-xp-pct" id="overall-progress-pct">0% complete</span>
-        </div>
-        <div class="curr-xp-right">
-          <button class="curr-reset-btn" id="reset-progress-btn" title="Reset progress">↺ Reset</button>
-        </div>
+        <span class="curr-xp-pct" id="overall-progress-pct">0% complete</span>
+      </div>
+      <div class="curr-xp-right">
+        <button class="curr-reset-btn" id="reset-progress-btn" title="Reset progress">↺ Reset</button>
       </div>
     </div>
+  </div>
 
+  <!-- MODULE PILL (fixed below XP bar, shows current module) -->
+  <div class="curr-module-pill" id="curr-module-pill" hidden>
+    <span class="curr-module-pill-icon" id="curr-module-pill-icon"></span>
+    <span class="curr-module-pill-name" id="curr-module-pill-name"></span>
+    <span class="curr-module-pill-prog" id="curr-module-pill-prog"></span>
+  </div>
+
+  <!-- PATH VIEW (hidden until Start is clicked) -->
+  <div class="curr-path-view" id="curr-path-view" hidden>
     <!-- LEARNING PATH -->
     <main class="curr-path" id="curriculum-path">
       <!-- Populated by curriculum.js -->
     </main>
-
   </div>
 
   <!-- ======== LESSON MODAL ======== -->
