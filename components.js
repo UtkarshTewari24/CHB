@@ -11,6 +11,7 @@ function getNavbar(activePage) {
     { href: 'volunteer.html', label: 'Volunteer', id: 'volunteer' },
     { href: 'team.html', label: 'Team', id: 'team' },
     { href: 'sessions.html', label: 'Sessions', id: 'sessions' },
+    { href: 'curriculum.html', label: 'Curriculum', id: 'curriculum' },
   ];
 
   const navLinksHTML = links.map(link =>

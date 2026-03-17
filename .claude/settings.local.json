@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 \"C:/Users/utkar_0fnlej6/Documents/CHB/append_init.py\")",
+      "Bash(node --check curriculum.js)",
+      "Bash(node --check components.js)"
+    ]
+  }
+}
