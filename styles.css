@@ -1560,53 +1560,50 @@ em,
     display: flex;
   }
 
-  /* Bottom sheet navigation */
+  /* Dropdown below the pill — position:absolute so it's not trapped by navbar's transform */
   .nav-menu {
-    position: fixed;
-    bottom: -100%;
+    position: absolute;
+    top: calc(100% + 10px);
     left: 0;
     right: 0;
     width: 100%;
     height: auto;
-    max-height: 80vh;
     background: var(--white);
     flex-direction: column;
     align-items: stretch;
-    padding: 0 16px max(32px, env(safe-area-inset-bottom));
-    gap: 4px;
-    border-radius: 24px 24px 0 0;
-    box-shadow: 0 -8px 60px rgba(0, 0, 0, 0.14);
-    transition: bottom 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 10px;
+    gap: 3px;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    /* hidden state */
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease,
+                padding 0.3s ease;
     z-index: 1001;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Drag handle */
-  .nav-menu::before {
-    content: '';
-    display: block;
-    width: 36px;
-    height: 4px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 100px;
-    margin: 14px auto 10px;
-    flex-shrink: 0;
   }
 
   .nav-menu.open {
-    bottom: 0;
+    max-height: 520px;
+    padding: 10px 10px 12px;
+    opacity: 1;
+    pointer-events: auto;
+    overflow-y: auto;
   }
 
   .nav-link {
     color: var(--gray-700);
     width: 100%;
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-radius: 12px;
-    min-height: 52px;
+    min-height: 48px;
     display: flex;
     align-items: center;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
   }
 
@@ -1618,16 +1615,18 @@ em,
 
   .nav-cta {
     margin-left: 0;
-    margin-top: 8px;
+    margin-top: 6px;
     width: 100%;
     text-align: center;
+    display: flex;
     justify-content: center;
     background: var(--blue);
     color: var(--white);
     border-color: transparent;
-    min-height: 52px;
-    border-radius: 14px;
-    font-size: 1rem;
+    min-height: 48px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    align-items: center;
   }
 
   .hero--home .container {
@@ -1734,6 +1733,21 @@ em,
   .signup-info h3,
   .form-card > h3 {
     font-size: 1.1rem;
+  }
+}
+
+/* ============================================
+   MOBILE NAVBAR FIX
+   ============================================ */
+@media (max-width: 768px) {
+  /* Shrink logo so it fits the pill, allow dropdown to overflow below */
+  .navbar {
+    height: 56px;
+    overflow: visible;
+  }
+
+  .logo-img {
+    height: 44px;
   }
 }
 

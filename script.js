@@ -14,26 +14,35 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(onScroll, 60);
 
   // Mobile menu
+  const closeNav = () => {
+    document.querySelector('.nav-hamburger')?.classList.remove('open');
+    document.querySelector('.nav-menu')?.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.nav-hamburger') || e.target.closest('.nav-overlay')) {
+    const m = document.querySelector('.nav-menu');
+
+    if (e.target.closest('.nav-hamburger')) {
       const h = document.querySelector('.nav-hamburger');
-      const m = document.querySelector('.nav-menu');
-      const o = document.querySelector('.nav-overlay');
-      if (h && m && o) {
+      if (h && m) {
+        const opening = !m.classList.contains('open');
         h.classList.toggle('open');
         m.classList.toggle('open');
-        o.classList.toggle('show');
-        document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
+        document.body.style.overflow = opening ? 'hidden' : '';
       }
+      return;
     }
+
+    // Close on nav-link / cta click
     if (e.target.closest('.nav-link') || e.target.closest('.nav-cta')) {
-      const m = document.querySelector('.nav-menu');
-      if (m?.classList.contains('open')) {
-        document.querySelector('.nav-hamburger')?.classList.remove('open');
-        m.classList.remove('open');
-        document.querySelector('.nav-overlay')?.classList.remove('show');
-        document.body.style.overflow = '';
-      }
+      closeNav();
+      return;
+    }
+
+    // Close when clicking outside the navbar
+    if (m?.classList.contains('open') && !e.target.closest('.navbar')) {
+      closeNav();
     }
   });
 

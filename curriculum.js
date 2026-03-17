@@ -249,6 +249,18 @@ function updateModulePill() {
   document.getElementById('curr-module-pill-prog').textContent = prog.done + '/' + prog.total;
 }
 
+var MODULE_PALETTES = [
+  { base: '#10b981', dark: '#064e3b', light: '#6ee7b7', glow: 'rgba(16,185,129,0.65)',  glowFaint: 'rgba(16,185,129,0.18)' },
+  { base: '#0ea5e9', dark: '#0c4a6e', light: '#7dd3fc', glow: 'rgba(14,165,233,0.65)',  glowFaint: 'rgba(14,165,233,0.18)' },
+  { base: '#84cc16', dark: '#1a2e05', light: '#bef264', glow: 'rgba(132,204,22,0.65)',  glowFaint: 'rgba(132,204,22,0.18)' },
+  { base: '#06b6d4', dark: '#164e63', light: '#67e8f9', glow: 'rgba(6,182,212,0.65)',   glowFaint: 'rgba(6,182,212,0.18)' },
+  { base: '#f43f5e', dark: '#4c0519', light: '#fda4af', glow: 'rgba(244,63,94,0.65)',   glowFaint: 'rgba(244,63,94,0.18)' },
+  { base: '#f59e0b', dark: '#451a03', light: '#fcd34d', glow: 'rgba(245,158,11,0.65)',  glowFaint: 'rgba(245,158,11,0.18)' },
+  { base: '#f97316', dark: '#431407', light: '#fdba74', glow: 'rgba(249,115,22,0.65)',  glowFaint: 'rgba(249,115,22,0.18)' },
+  { base: '#a855f7', dark: '#3b0764', light: '#d8b4fe', glow: 'rgba(168,85,247,0.65)',  glowFaint: 'rgba(168,85,247,0.18)' },
+  { base: '#3b82f6', dark: '#1e3a8a', light: '#93c5fd', glow: 'rgba(59,130,246,0.65)',  glowFaint: 'rgba(59,130,246,0.18)' }
+];
+
 function renderPath() {
   var container = document.getElementById('curriculum-path');
   if (!container) return;
@@ -256,6 +268,7 @@ function renderPath() {
 
   // Bottom-to-top: T3 first in DOM, T1 last → T1 L1 sits at very bottom (the start)
   var tiersReversed = CURRICULUM.tiers.slice().reverse();
+  var globalNodeIdx = 0;
 
   tiersReversed.forEach(function(tier) {
     var tierOrigIdx = CURRICULUM.tiers.indexOf(tier);
@@ -265,16 +278,29 @@ function renderPath() {
 
     // Modules reversed so M1 is at bottom; within each module lessons reversed so L1 at bottom
     var nodesHtml = tier.modules.slice().reverse().map(function(mod) {
+      var modOrigIdx = tier.modules.indexOf(mod);
+      var palIdx = tierOrigIdx * 3 + modOrigIdx;
+      var pal = MODULE_PALETTES[palIdx] || MODULE_PALETTES[0];
+
       var lessonsHtml = mod.lessons.slice().reverse().map(function(lesson) {
         var li = mod.lessons.indexOf(lesson);
         var unlocked = isLessonUnlocked(tier, mod, li);
         var done = isLessonComplete(lesson.id);
         var cls = 'lesson-node' + (!unlocked ? ' locked' : done ? ' completed' : '');
-        return '<div class="lesson-node-wrapper">' +
+        var sideClass = (globalNodeIdx % 2 === 0) ? 'lnw-even' : 'lnw-odd';
+        globalNodeIdx++;
+
+        var circleStyle = done
+          ? 'background:linear-gradient(135deg,' + pal.base + ',' + pal.light + ');border:2.5px solid ' + pal.light + ';box-shadow:0 0 0 5px ' + pal.glowFaint + ',0 4px 16px ' + pal.glow + ';'
+          : (!unlocked
+            ? ''
+            : 'background:linear-gradient(135deg,' + pal.dark + ',' + pal.base + ');border:2.5px solid ' + pal.light + ';--node-glow:' + pal.glow + ';--node-glow-faint:' + pal.glowFaint + ';');
+
+        return '<div class="lesson-node-wrapper ' + sideClass + '">' +
           '<div class="' + cls + '"' +
           ' data-tier-id="' + tier.id + '" data-mod-id="' + mod.id + '" data-lesson-idx="' + li + '"' +
           ' tabindex="' + (unlocked ? 0 : -1) + '" role="button" aria-label="' + lesson.title + '">' +
-          '<div class="lesson-node-circle">' +
+          '<div class="lesson-node-circle" style="' + circleStyle + '">' +
           (done ? '<span class="lesson-node-check">\u2713</span>' : (!unlocked ? '\uD83D\uDD12' : lesson.icon)) +
           '</div>' +
           '<div class="lesson-node-label">' + lesson.title + '</div>' +
@@ -3151,6 +3177,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var modPill = document.getElementById('curr-module-pill');
         if (xpBar) xpBar.removeAttribute('hidden');
         if (modPill) modPill.removeAttribute('hidden');
+        var nav = document.querySelector('.navbar');
+        if (nav) nav.style.display = 'none';
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       }, 380);
     });
